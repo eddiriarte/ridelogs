@@ -6,7 +6,7 @@ services:
             context: ./docker/app
             dockerfile: Dockerfile
         networks:
-            - appnet
+            - app_network
         volumes:
             - .:/var/www/html
         ports:
@@ -16,7 +16,7 @@ services:
     swagger:
         image: swaggerapi/swagger-ui:latest
         networks:
-            - appnet
+            - app_network
         volumes:
             - ./docs/api:/usr/share/nginx/html/docs/
         ports:
@@ -33,11 +33,9 @@ services:
         ports:
             - 5432:5432
         volumes:
-            - dbdata:/var/lib/postgresql/data
-            - ./docker/db/pg_roles.sql:/docker-entrypoint-initdb.d/pg_roles.sql:delegated
-            - ./docker/db/pg_extensions.sql:/docker-entrypoint-initdb.d/pg_extensions.sql:delegated
+            - db_data:/var/lib/postgresql/data
         networks:
-            - appnet
+            - app_network
 
     test_db:
         image: "postgres:13"
@@ -46,18 +44,15 @@ services:
             - POSTGRES_USER=root
             - POSTGRES_DB=app
         ports:
-            - 15432:5432
-        volumes:
-            - ./docker/db/pg_roles.sql:/docker-entrypoint-initdb.d/pg_roles.sql:delegated
-            - ./docker/db/pg_extensions.sql:/docker-entrypoint-initdb.d/pg_extensions.sql:delegated
+            - 5432
         networks:
-            - appnet
+            - app_network
 
 volumes:
-    dbdata:
+    db_data:
         driver: local
 
 networks:
-    appnet:
+    app_network:
         driver: bridge
 
